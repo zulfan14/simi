@@ -40,4 +40,9 @@ class Direktorat extends Model
      {
          return $this->hasMany(User::class, 'direktorat_id'); // 'direktorat_id' adalah foreign key di tabel user
      }
+
+     public function barangs()
+     {
+         return $this->hasMany(Barang::class, 'direktorat_id');
+     }
 }

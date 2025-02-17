@@ -30,7 +30,7 @@ class BarangController extends Controller
 
     public function getDataBarang()
     {
-        $barangs = Barang::all();
+        $barangs = Barang::with(['direktorat', 'jenis'])->get();
         
         return response()->json([
             'success'   => true,
@@ -53,21 +53,17 @@ class BarangController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'qty'           => 'required',
             'nama_barang'   => 'required',
-            'deskripsi'     => 'required',
-            'gambar'        => 'required|mimes:jpeg,png,jpg',
-            'stok_minimum'  => 'required|numeric',
-            'jenis_id'      => 'required',
-            'satuan_id'     => 'required'
+            'gambar'        => 'mimes:jpeg,png,jpg',
+            'tahun'         => 'required',
+            'harga_satuan'         => 'required',
         ], [
+            'qty.required'          => 'Jumlah Barang Wajib Di Isi !',
             'nama_barang.required'  => 'Form Nama Barang Wajib Di Isi !',
-            'deskripsi.required'    => 'Form Deskripsi Wajib Di Isi !',
-            'gambar.required'       => 'Tambahkan Gambar !',
             'gambar.mimes'          => 'Gunakan Gambar Yang Memiliki Format jpeg, png, jpg !',
-            'stok_minimum.required' => 'Form Stok Minimum Wajib Di Isi !',
-            'stok_minimum.numeric'  => 'Gunakan Angka Untuk Mengisi Form Ini !',
-            'jenis_id.required'     => 'Pilih Jenis Barang !',
-            'satuan_id.required'    => 'Pilih Jenis Barang !'
+            'tahun.required'        => 'Tahun Perolehan Wajib Di Isi !',
+            'harga_satuan.required'        => 'Harga Satuan Wajib Di Isi !',
         ]);
 
         if ($request->hasFile('gambar')) 
@@ -79,13 +75,6 @@ class BarangController extends Controller
         } else{
             $gambar = null;
         }
-          
-        $kode_barang = 'BRG-' . str_pad(rand(1, 99999), 5, '0', STR_PAD_LEFT);
-        $request->merge([
-            'kode_barang'   => $kode_barang,
-            'gambar'        => $gambar,
-            'user_id'       => auth()->user()->id,
-        ]);
 
         if($validator->fails()) {
             return response()->json($validator->errors(), 422);
@@ -94,15 +83,17 @@ class BarangController extends Controller
         $user = auth()->user();
 
         $barang = Barang::create([
+            'qty'         => $request->qty,
             'nama_barang' => $request->nama_barang,
             'deskripsi'   => $request->deskripsi,
-            'user_id'     => $request->user_id,
-            'kode_barang' => $request->kode_barang,
             'gambar'      => $path . $fileName,
-            'stok_minimum'=> $request->stok_minimum,
-            'jenis_id'    => $request->jenis_id,
-            'satuan_id'   => $request->satuan_id,
-            'direktorat_id' => $user->direktorat_id,
+            'tahun'       => $request->tahun,
+            'lama_perbaikan'    => $request->lama_perbaikan,
+            'direktorat_id'     => $user->direktorat_id,
+            'is_aset'           => $request->is_aset,
+            'jenis_id'          => $request->jenis_id,
+            'kondisi_barang'    => $request->kondisi_barang,
+            'harga_satuan'      => $request->harga_satuan,
         ]);
 
         return response()->json([

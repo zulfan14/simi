@@ -27,13 +27,28 @@
                 </div>
                 <div class="form-group">
                   <label>Jumlah Barang</label>
-                  <input type="number" class="form-control" name="jumlah_barang" id="jumlah_barang">
-                  <div class="mt-2 alert alert-danger d-none" role="alert" id="alert-jumlah_barang"></div>
+                  <input type="number" class="form-control" name="qty" id="qty">
+                  <div class="mt-2 alert alert-danger d-none" role="alert" id="alert-qty"></div>
+                </div>
+                <div class="form-group">
+                  <label>Harga Satuan Barang</label>
+                  <input type="number" class="form-control" name="harga_satuan" id="harga_satuan">
+                  <div class="mt-2 alert alert-danger d-none" role="alert" id="alert-harga_satuan"></div>
+                </div>
+                <div class="form-group">
+                  <label>Deskripsi Barang</label>
+                  <input type="text" class="form-control" name="deskripsi" id="deskripsi">
+                  <div class="mt-2 alert alert-danger d-none" role="alert" id="alert-deskripsi"></div>
+                </div>
+                <div class="form-group">
+                  <label>Tahun Perolehan Barang</label>
+                  <input type="date" class="form-control" name="tahun" id="tahun">
+                  <div class="mt-2 alert alert-danger d-none" role="alert" id="alert-tahun"></div>
                 </div>
                 <div class="form-group">
                   <label>Lama pemeliharaan (hari) </label>
-                  <input type="harga" class="form-control" name="pemeliharaan" id="pemeliharaan">
-                  <div class="mt-2 alert alert-danger d-none" role="alert" id="alert-pemeliharaan"></div>
+                  <input type="number" class="form-control" name="lama_perbaikan" id="lama_perbaikan">
+                  <div class="mt-2 alert alert-danger d-none" role="alert" id="alert-lama_perbaikan"></div>
                 </div>
                 <div class="form-group">
                   <label>Jenis Barang</label>
@@ -49,14 +64,14 @@
                 </div>
                 <div class="form-group">
                   <label>Apakah Barang Termasuk Asset</label>
-                  <select class="form-control" name="jenis_id" id="jenis_id">
+                  <select class="form-control" name="is_aset" id="is_aset">
                           <option value="1" selected>YA</option>
                           <option value="0">Tidak</option>
                   </select>
                 </div>
                 <div class="form-group">
                   <label>Kondisi Barang</label>
-                  <select class="form-control" name="jenis_id" id="jenis_id">
+                  <select class="form-control" name="kondisi_barang" id="kondisi_barang">
                           <option value="1" selected>Baik</option>
                           <option value="2">Rusak Ringan</option>
                           <option value="3">Rusak</option>

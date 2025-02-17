@@ -16,7 +16,7 @@ class Barang extends Model
     use HasFactory;
     use LogsActivity;
 
-    protected $fillable = ['kode_barang', 'nama_barang', 'deskripsi', 'gambar', 'stok_minimum', 'jenis_id', 'stok', 'satuan_id', 'user_id'];
+    protected $fillable = ['qty', 'nama_barang', 'deskripsi', 'gambar', 'tahun', 'lama_perbaikan', 'is_aset', 'jenis_id', 'kondisi_barang', 'harga_satuan', 'direktorat_id'];
     protected $guarded = [''];
     protected $ignoreChangedAttributes = ['updated_at'];
 
@@ -46,9 +46,8 @@ class Barang extends Model
         return $this->belongsTo(Jenis::class, 'jenis_id');
     }
 
-    // Satu Barang memiliki 1 satuan
-    public function satuan()
+    public function direktorat()
     {
-        return $this->belongsTo(Satuan::class, 'satuan_id');
+        return $this->belongsTo(Direktorat::class, 'direktorat_id');
     }
 }
