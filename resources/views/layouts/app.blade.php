@@ -6,6 +6,8 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>SIMI</title>
 
+  <link rel="icon" type="image/x-icon" src="assets/img/avatar/simi_logo.png">
+
   <!-- General CSS Files -->
   <link rel="stylesheet" href="assets/modules/bootstrap/css/bootstrap.min.css">
   <link rel="stylesheet" href="assets/modules/fontawesome/css/all.min.css">
@@ -53,7 +55,47 @@
           </div>
         </form>
         <ul class="navbar-nav navbar-right">
-          
+        <li class="dropdown dropdown-list-toggle"><a href="#" data-toggle="dropdown" class="nav-link notification-toggle nav-link-lg beep"><i class="far fa-bell"></i></a>
+            <div class="dropdown-menu dropdown-list dropdown-menu-right">
+              <div class="dropdown-header">Notifications
+                <div class="float-right">
+                  <a href="#">Mark All As Read</a>
+                </div>
+              </div>
+              <div class="dropdown-list-content dropdown-list-icons">
+                <a href="#" class="dropdown-item dropdown-item-unread">
+                  <div class="text-white dropdown-item-icon bg-primary">
+                    <i class="fas fa-code"></i>
+                  </div>
+                  <div class="dropdown-item-desc">
+                    Template update is available now!
+                    <div class="time text-primary">2 Min Ago</div>
+                  </div>
+                </a>
+                <a href="#" class="dropdown-item">
+                  <div class="text-white dropdown-item-icon bg-info">
+                    <i class="far fa-user"></i>
+                  </div>
+                  <div class="dropdown-item-desc">
+                    <b>You</b> and <b>Dedik Sugiharto</b> are now friends
+                    <div class="time">10 Hours Ago</div>
+                  </div>
+                </a>
+                <a href="#" class="dropdown-item">
+                  <div class="text-white dropdown-item-icon bg-success">
+                    <i class="fas fa-check"></i>
+                  </div>
+                  <div class="dropdown-item-desc">
+                    <b>Kusnaedi</b> has moved task <b>Fix bug header</b> to <b>Done</b>
+                    <div class="time">12 Hours Ago</div>
+                  </div>
+                </a>
+              </div>
+              <div class="text-center dropdown-footer">
+                <a href="#">View All <i class="fas fa-chevron-right"></i></a>
+              </div>
+            </div>
+          </li>
 
           <li class="dropdown"><a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
             <img alt="image" src="assets/img/avatar/avatar-1.png" class="mr-1 rounded-circle">
@@ -92,7 +134,8 @@
         <aside id="sidebar-wrapper">
 
           <div class="sidebar-brand">
-            <a href="/" style="font-size: 40px !important; color: brown;">SIMI</a>
+            <img alt="image" src="assets/img/avatar/simi_logo.png" style="width: 85px !important; float:left; margin-left: 15px;">
+            <!-- <a href="/" style="font-size: 40px !important; color: brown;">SIMI</a> -->
           </div>
 
           <ul class="sidebar-menu"> 
@@ -146,7 +189,7 @@
               <li><a class="nav-link {{ Request::is('laporan-stok') ? 'active' : '' }}" href="laporan-stok"><i class="fa fa-sharp fa-reguler fa-file"></i><span>Berdasarkan Kondisi Barang</span></a></li>
               <li><a class="nav-link {{ Request::is('laporan-barang-masuk') ? 'active' : '' }}" href="laporan-barang-masuk"><i class="fa fa-regular fa-file-import"></i><span>Berdasarkan Tanggal</span></a></li>
               <li><a class="nav-link {{ Request::is('laporan-barang-keluar') ? 'active' : '' }}" href="#"><i class="fa fa-sharp fa-regular fa-file-export"></i><span>Penyusutan Stok</span></a></li>
-              <li><a class="nav-link {{ Request::is('laporan-barang-keluar') ? 'active' : '' }}" href="#"><i class="fa fa-sharp fa-regular fa-file-export"></i><span>Amprahan</span></a></li>
+              <li><a class="nav-link {{ Request::is('amprahan') ? 'active' : '' }}" href="amprahan"><i class="fa fa-sharp fa-regular fa-file-export"></i><span>Amprahan</span></a></li>
               
               <li class="menu-header">MANAJEMEN USER</li>
               <li><a class="nav-link {{ Request::is('data-pengguna') ? 'active' : '' }}" href="data-pengguna"><i class="fa fa-solid fa-users"></i><span>Data Pengguna</span></a></li>

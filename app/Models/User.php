@@ -55,4 +55,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Direktorat::class, 'direktorat_id');
     }
+
+    public function amprahan()
+    {
+        return $this->belongsTo(Amprahan::class, 'user_id');
+    }
+
 }

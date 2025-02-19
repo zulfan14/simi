@@ -18,6 +18,7 @@ use App\Http\Controllers\LaporanBarangMasukController;
 use App\Http\Controllers\LaporanStokController;
 use App\Http\Controllers\ManajemenUserController;
 use App\Http\Controllers\UbahPasswordController;
+use App\Http\Controllers\AmprahanController;
 use App\Models\BarangKeluar;
 use App\Models\BarangMasuk;
 
@@ -67,9 +68,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/laporan-barang-keluar/print-barang-keluar', [LaporanBarangKeluarController::class, 'printBarangKeluar']);
         Route::get('/api/customer/', [LaporanBarangKeluarController::class, 'getCustomer']);
         Route::resource('/laporan-barang-keluar', LaporanBarangKeluarController::class);
-
+        
         Route::get('/ubah-password', [UbahPasswordController::class,'index']);
         Route::POST('/ubah-password', [UbahPasswordController::class, 'changePassword']);
+        
+        Route::get('/amprahan', [AmprahanController::class, 'index']);
+        Route::get('/amprahan/get-data', [AmprahanController::class, 'getDataAmprahan']);
+        Route::get('/amprahan/print-amprahan/{id}', [AmprahanController::class, 'printAmprahan']);
+        Route::resource('/amprahan', AmprahanController::class);
     });
 
 

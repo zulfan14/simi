@@ -93,8 +93,8 @@
                 let barang = `        
                 <tr class="barang-row" id="index_${value.id}">
                     <td>${counter++}</td>
-                    <td><img src="/storage/${value.gambar}" alt="gambar Barang" style="width: 150px"; height="150px"></td>
-                    <td>${value.nama_barang}</td>
+                    // <td><img src="/storage/${value.gambar}" alt="gambar Barang" style="width: 150px"; height="150px"></td>
+                    <td>${value.nama_barang} - ${value.id}</td>
                     <td>${value.qty}</td>
                     <td>${value.deskripsi}</td>
                     <td>${value.tahun}</td>
