@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@include('supplier.create')
-@include('supplier.edit')
+@include('amprahan.create')
+@include('amprahan.edit')
 
 @section('content')
 <div class="dashboard-first">
@@ -9,7 +9,7 @@
     <div class="row">
         <h1 style="margin-top: 10px !important;">Data Amprahan</h1>
         <div class="ml-auto" style="margin-top: 10px !important;">
-            <a href="javascript:void(0)" class="btn btn-primary" id="btn_tambah_direktorat"><i class="fa fa-plus"></i>
+            <a href="javascript:void(0)" class="btn btn-primary" id="btn_tambah_amprahan"><i class="fa fa-plus"></i>
                 Amprahan</a>
         </div>
     </div>
@@ -67,7 +67,7 @@
                         <td>${value.user.name}</td>
                         <td>${status}</td>
                         <td>
-                            <a href="/amprahan/print-amprahan/${value.id}" target="_blank" data-id="${value.id}" class="mb-2 btn btn-icon btn-warning btn-lg"><i class="far fa-edit"></i> </a>
+                            <a href="/amprahan/print-amprahan/${value.id}" target="_blank" data-id="${value.id}" class="mb-2 btn btn-icon btn-success btn-lg"><i class="fa fa-sharp fa-light fa-print"></i> </a>
                             <a href="javascript:void(0)" id="button_hapus_amprahan" data-id="${value.id}" class="mb-2 btn btn-icon btn-danger btn-lg"><i class="fas fa-trash"></i> </a>
                         </td>
                     </tr>
@@ -78,7 +78,7 @@
 
                 $('#direktorat').val('');
                 $('#direktorat').val('');
-                $('#modal_tambah_direktorat').modal('hide');
+                $('#modal_tambah_amprahan').modal('hide');
 
                 let table = $('#table_id').DataTable();
                 table.draw(); // memperbarui Datatables
@@ -98,8 +98,8 @@
 
     <!-- Show Modal Tambah Jenis Barang -->
     <script>
-        $('body').on('click', '#btn_tambah_direktorat', function() {
-            $('#modal_tambah_direktorat').modal('show');
+        $('body').on('click', '#btn_tambah_amprahan', function() {
+            $('#modal_tambah_amprahan').modal('show');
         });
 
         $('#store').click(function(e) {

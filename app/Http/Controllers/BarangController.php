@@ -4,13 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Jenis;
 use App\Models\Barang;
-use Illuminate\Http\File;
+// use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Satuan;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
+use Dompdf\Options;
+use Dompdf\Dompdf;
+use Illuminate\Support\Facades\File;
 
 
 
@@ -216,4 +220,251 @@ class BarangController extends Controller
             'message' => 'Data Barang Berhasil Dihapus!'
         ]);
     }
+
+    public function showDetail($id)
+    {
+        // Mencari barang berdasarkan ID
+        $barang = Barang::with(['direktorat', 'jenis'])->find($id);
+
+        // Jika barang ditemukan, tampilkan ke view
+        if ($barang) {
+            return view('barang.detail', [
+                'barang' => $barang
+            ]);
+        }
+
+        // Jika barang tidak ditemukan, tampilkan pesan error
+        return redirect()->route('barang.index')->with('error', 'Barang tidak ditemukan');
+    }
+
+    public function laporanPenyusutan()
+    {
+        // Ambil semua barang yang is_aset = 1
+        $barangs = Barang::where('is_aset', 1)->get();
+
+        // Buat array untuk laporan penyusutan
+        $laporan = [];
+
+        foreach ($barangs as $barang) {
+            // Menghitung penyusutan
+            $hargaPerolehan = $barang->harga_satuan;
+            $tahunSekarang = Carbon::now()->year;
+            $tahunPerolehan = Carbon::parse($barang->tahun)->year;  // Mengambil tahun saja
+
+            $selisihTahun = $tahunSekarang - $tahunPerolehan;
+            $persenPenyusutan = 5; // 5% per tahun
+
+            // Pengurangan per tahun
+            $pengurangan = max(0, $hargaPerolehan * ($persenPenyusutan / 100) * $selisihTahun);
+
+            // Harga setelah penyusutan
+            $hargaSetelahPenyusutan = max(0, $hargaPerolehan - $pengurangan);
+
+            // Menambahkan data ke laporan
+            $laporan[] = [
+                'nama_aset' => $barang->nama_barang,
+                'tahun_perolehan' => $tahunPerolehan,  // Menampilkan tahun saja
+                'quantity' => $barang->qty,
+                'harga_perolehan' => $barang->harga_satuan,
+                'tahun_sekarang' => $tahunSekarang,
+                'pengurangan' => $pengurangan,
+                'harga_setelah_penyusutan' => $hargaSetelahPenyusutan,
+            ];
+        }
+
+        // Tampilkan laporan
+        return view('barang.laporan', ['laporan' => $laporan]);
+    }
+
+
+    public function data_penyusutan()
+    {
+        // Mengambil data barang yang is_aset = 1
+
+        $data = $this->getDataPenyusutan();
+
+        return response()->json([
+            'success'   => true,
+            'data'      => $data
+        ]);
+    }
+    
+    public function print_data_penyusutan()
+    {
+        $data_penyusutan = $this->getDataPenyusutan();
+
+        // Konversi gambar ke base64
+        $path = public_path('assets/img/kop.png');
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = File::get($path);
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $dompdf = new Dompdf($options);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->set_option('defaultPaperSize', 'A4');
+        $dompdf->set_option('isRemoteEnabled', true);
+
+        // Generate PDF
+        $dompdf = new Dompdf();
+        $html = view('/barang/print_penyusutan', compact('data_penyusutan', 'base64'))->render();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        $dompdf->stream('print-amprahan.pdf', ['Attachment' => false]);
+
+    }
+
+    public function getDataPenyusutan()
+    {
+        $barangs = Barang::where('is_aset', 1)
+            ->get();
+
+        $data = [];
+        
+        foreach ($barangs as $barang) {
+            // Menghitung penyusutan
+            $hargaPerolehan = $barang->harga_satuan;
+            $tahunSekarang = Carbon::now()->year;
+            $tahunPerolehan = Carbon::parse($barang->tahun)->year; // Mengambil tahun saja
+            
+            $selisihTahun = $tahunSekarang - $tahunPerolehan;
+            $persenPenyusutan = 5; // 5% per tahun
+
+            // Pengurangan per tahun
+            $pengurangan = max(0, $hargaPerolehan * ($persenPenyusutan / 100) * $selisihTahun);
+
+            // Harga setelah penyusutan
+            $hargaSetelahPenyusutan = max(0, $hargaPerolehan - $pengurangan);
+
+            // Format data untuk dikirimkan ke client
+            $data[] = [
+                'id' => $barang->id,
+                'nama_aset' => $barang->nama_barang,
+                'tahun_perolehan' => $tahunPerolehan,
+                'quantity' => $barang->qty,
+                'harga_perolehan' => $hargaPerolehan,
+                'tahun_sekarang' => $tahunSekarang,
+                'pengurangan' => $pengurangan,
+                'harga_setelah_penyusutan' => $hargaSetelahPenyusutan,
+            ];
+        }
+
+        return $data;
+
+    }
+
+    public function kondisi_barang(){
+        $years = range(date('Y'), 1990);
+
+        $jenis_barang = Jenis::all(); // Ambil data jenis barang
+
+        return view('laporan-kondisi-barang.index', compact('years', 'jenis_barang'));
+    }
+
+    public function fetch_kondisi_barang(Request $request)
+    {
+        // Ambil parameter dari request
+        $kondisi = $request->kondisi;
+        $tahun = $request->tahun;
+        $jenis = $request->jenis;
+        $start = $request->start; // Untuk menentukan offset
+        $length = $request->length; // Untuk menentukan limit
+        
+        // Query dasar untuk mendapatkan data barang
+        $query = Barang::with(['direktorat', 'jenis']);
+
+        // Filter berdasarkan kondisi jika ada
+        if ($kondisi) {
+            $query->where('kondisi_barang', $kondisi);
+        }
+
+        // Filter berdasarkan tahun (created_at) jika ada
+        if ($tahun) {
+            $query->whereYear('created_at', $tahun);
+        }
+
+        // Filter berdasarkan jenis jika ada
+        if ($jenis) {
+            $query->where('jenis_id', $jenis);
+        }
+
+        // Ambil data dengan pagination menggunakan offset dan limit dari request
+        $barangs = $query->offset($start)->limit($length)->get();
+
+        // Total records tanpa filter
+        $totalRecords = Barang::count();
+
+        // Total records setelah filter
+        $filteredRecords = $query->count();
+
+        return response()->json([
+            "draw" => $request->draw,
+            "recordsTotal" => $totalRecords, 
+            "recordsFiltered" => $filteredRecords,
+            "data" => $barangs
+        ]);
+    }
+
+
+    public function fetch_jenis_barang()
+    {
+        $jenis_barang = Jenis::all(); // Ambil semua jenis barang dari tabel Jenis
+        return response()->json([
+            'success' => true,
+            'data' => $jenis_barang
+        ]);
+    }
+
+    public function print_laporan_barang(Request $request)
+    {
+         // Ambil parameter dari request
+         $kondisi = $request->kondisi;
+         $tahun = $request->tahun;
+         $jenis = $request->jenis;
+         
+         // Query dasar untuk mendapatkan data barang
+         $query = Barang::with(['direktorat', 'jenis']);
+ 
+         // Filter berdasarkan kondisi jika ada
+         if (!empty($kondisi)) {
+             $query->where('kondisi_barang', $kondisi);
+         }
+ 
+         // Filter berdasarkan tahun (created_at) jika ada
+         if (!empty($tahun)) {
+             $query->whereYear('created_at', $tahun);
+         }
+ 
+         // Filter berdasarkan jenis jika ada
+         if (!empty($jenis)) {
+             $query->where('jenis_id', $jenis);
+         }
+ 
+         // Ambil data dengan pagination menggunakan offset dan limit dari request
+         $barangs = $query->get();
+
+        $path = public_path('assets/img/kop.png');
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = File::get($path);
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+        // Generate PDF
+        $dompdf = new Dompdf();
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $dompdf->setOptions($options);
+        $dompdf->setPaper('A4', 'landscape');
+
+        $html = view('/laporan-kondisi-barang/print_laporan_barang', compact('barangs', 'base64'))->render();
+
+        $dompdf->loadHtml($html);
+        $dompdf->render();
+
+        // Mengirim file PDF untuk diunduh langsung oleh pengguna
+        return $dompdf->stream('laporan_barang.pdf', ['Attachment' => false]);
+    }
+
+
 }

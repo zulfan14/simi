@@ -21,6 +21,7 @@ use App\Http\Controllers\UbahPasswordController;
 use App\Http\Controllers\AmprahanController;
 use App\Models\BarangKeluar;
 use App\Models\BarangMasuk;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,29 +46,20 @@ Route::middleware('auth')->group(function () {
         Route::resource('/hak-akses', HakAksesController::class);
     });
 
-    Route::group(['middleware' => 'checkRole:superadmin,kepala gudang'], function(){
+    Route::group(['middleware' => 'checkRole:superadmin,user'], function(){
         Route::resource('/aktivitas-user', ActivityLogController::class);
         
     });
 
-    Route::group(['middleware' => 'checkRole:kepala gudang,superadmin,admin gudang'], function(){
+    Route::group(['middleware' => 'checkRole:user,superadmin,admin'], function(){
+
+        Route::get('/barang/detail/{id}', [BarangController::class, 'showDetail'])->name('barang.detail');
+        Route::get('/barang/get-data', [BarangController::class, 'getDataBarang']);
+        Route::resource('/barang', BarangController::class);
+
         Route::resource('/dashboard', DashboardController::class);
         Route::get('/', [DashboardController::class, 'index']);
-        
-        Route::get('/laporan-stok/get-data', [LaporanStokController::class, 'getData']);
-        Route::get('/laporan-stok/print-stok', [LaporanStokController::class, 'printStok']);
-        Route::get('/api/satuan/', [LaporanStokController::class, 'getSatuan']);
-        Route::resource('/laporan-stok', LaporanStokController::class);
-       
-        Route::get('/laporan-barang-masuk/get-data', [LaporanBarangMasukController::class, 'getData']);
-        Route::get('/laporan-barang-masuk/print-barang-masuk', [LaporanBarangMasukController::class, 'printBarangMasuk']);
-        Route::get('/api/supplier/', [LaporanBarangMasukController::class, 'getSupplier']);
-        Route::resource('/laporan-barang-masuk', LaporanBarangMasukController::class);
     
-        Route::get('/laporan-barang-keluar/get-data', [LaporanBarangKeluarController::class, 'getData']);
-        Route::get('/laporan-barang-keluar/print-barang-keluar', [LaporanBarangKeluarController::class, 'printBarangKeluar']);
-        Route::get('/api/customer/', [LaporanBarangKeluarController::class, 'getCustomer']);
-        Route::resource('/laporan-barang-keluar', LaporanBarangKeluarController::class);
         
         Route::get('/ubah-password', [UbahPasswordController::class,'index']);
         Route::POST('/ubah-password', [UbahPasswordController::class, 'changePassword']);
@@ -76,12 +68,24 @@ Route::middleware('auth')->group(function () {
         Route::get('/amprahan/get-data', [AmprahanController::class, 'getDataAmprahan']);
         Route::get('/amprahan/print-amprahan/{id}', [AmprahanController::class, 'printAmprahan']);
         Route::resource('/amprahan', AmprahanController::class);
+
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::get('/notifications/{id}/read', [NotificationController::class, 'markAsReadAndRedirect'])->name('notification.read');
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+
+        Route::get('laporan/kondisi_barang', [BarangController::class, 'kondisi_barang'])->name('laporan.kondisi_barang');
+        Route::get('laporan/data-penyusutan', [BarangController::class, 'data_penyusutan']);
+        Route::get('laporan/print_penyusutan', [BarangController::class, 'print_data_penyusutan'])->name('laporan.print_penyusutan');
+        
+        
+        Route::get('/laporan/fetch_kondisi_barang', [BarangController::class, 'fetch_kondisi_barang']);
+        Route::get('/laporan/fetch_jenis_barang', [BarangController::class, 'fetch_jenis_barang']);
+        Route::get('/laporan/print_barang', [BarangController::class, 'print_laporan_barang'])->name('laporan.print_barang');
+
     });
 
 
-    Route::group(['middleware' => 'checkRole:superadmin,admin gudang'], function(){
-        Route::get('/barang/get-data', [BarangController::class, 'getDataBarang']);
-        Route::resource('/barang', BarangController::class);
+    Route::group(['middleware' => 'checkRole:superadmin,admin'], function(){
     
         Route::get('/jenis-barang/get-data', [JenisController::class, 'getDataJenisBarang']);
         Route::resource('/jenis-barang', JenisController::class);
@@ -104,6 +108,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/barang-keluar/get-data', [BarangKeluarController::class, 'getDataBarangKeluar']);
         Route::get('/api/satuan/', [BarangKeluarController::class, 'getSatuan']);
         Route::resource('/barang-keluar', BarangKeluarController::class);
+
+        Route::get('laporan/penyusutan', [BarangController::class, 'laporanPenyusutan'])->name('laporan.penyusutan');
+        Route::get('laporan/data-penyusutan', [BarangController::class, 'data_penyusutan']);
+        Route::get('laporan/print_penyusutan', [BarangController::class, 'print_data_penyusutan'])->name('laporan.print_penyusutan');
+        // Tambahkan route untuk mendapatkan data penyusutan barang
+
     });
 
 

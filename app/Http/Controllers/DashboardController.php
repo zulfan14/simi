@@ -8,6 +8,8 @@ use App\Models\BarangMasuk;
 use App\Models\BarangKeluar;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -39,6 +41,12 @@ class DashboardController extends Controller
     
         $barangMinimum = 1;
         
+        $this->checkBarangForNotification(); // 🔔 Cek notifikasi setiap kali dashboard diakses
+        $barangList = Barang::all();
+        $notifications = Notification::where('user_id', auth()->id())
+                                     ->orderBy('created_at', 'desc')
+                                     ->take(4)
+                                     ->get();
                                 
         return view('dashboard', [
             'barang'            => $barangCount,
@@ -47,55 +55,54 @@ class DashboardController extends Controller
             'user'              => $userCount,
             'barangMasukData'   => $barangMasukPerBulan,
             'barangKeluarData'  => $barangKeluarPerBulan,
-            'barangMinimum'     => $barangMinimum
+            'barangMinimum'     => $barangMinimum,
+            'notifications'     => $notifications,
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    private function checkBarangForNotification()
     {
-        //
+        $barangList = Barang::whereNotNull('lama_perbaikan')->get();
+
+        foreach ($barangList as $barang) {
+            $lastNotified = $barang->last_notified_at
+                ? Carbon::parse($barang->last_notified_at)
+                : Carbon::parse($barang->tahun);
+
+            $nextNotificationDate = $lastNotified->addDays($barang->lama_perbaikan);
+
+            if (Carbon::now()->greaterThanOrEqualTo($nextNotificationDate)) {
+                $users = User::where(function ($query) use ($barang) {
+                    $query->where('role_id', '!=', '3')
+                        ->orWhere(function ($subQuery) use ($barang) {
+                            $subQuery->where('role_id', '3')
+                                    ->where('direktorat_id', $barang->direktorat_id);
+                        });
+                })->get();
+
+                foreach ($users as $user) {
+                    Notification::create([
+                        'user_id' => $user->id,
+                        'message' => " Perbaikan barang *{$barang->nama_barang}* sudah waktunya dilakukan.",
+                        'type'    => 1,
+                        'icon'    => 'fas fa-tools',
+                        'link'    => $barang->id,
+                    ]);
+                }
+
+                $barang->update(['last_notified_at' => Carbon::now()]);
+            }
+        }
     }
 
     /**
-     * Store a newly created resource in storage.
+     * 📨 Tandai notifikasi sebagai telah dibaca.
      */
-    public function store(Request $request)
+    public function markNotificationAsRead($id)
     {
-        //
-    }
+        $notification = Notification::findOrFail($id);
+        $notification->update(['read_at' => Carbon::now()]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->back()->with('success', 'Notifikasi ditandai sebagai telah dibaca.');
     }
 }

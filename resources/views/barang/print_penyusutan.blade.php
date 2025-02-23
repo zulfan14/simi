@@ -58,22 +58,7 @@
 
     <!-- Header, Nomor, Lampiran, Perihal -->
     <div class="content">
-        <p><strong>Nomor:</strong> {{$amprahan->nama_barang}}</p>
-        <p><strong>Lampiran:</strong> {{$amprahan->lampiran}}</p>
-        <p><strong>Perihal:</strong> {{$amprahan->perihal}}</p>
-    </div>
-    
-    <!-- Address Section -->
-    <div class="content">
-        <p>Kepada Yang Terhormat,</p>
-        <p>Rektor Universitas Ubudiyah Indonesia</p>
-        <p>Di tempat</p>
-    </div>
-
-    <!-- Greeting and Body -->
-    <div class="content">
-        <p>Assalaamu'alaikum Wr. Wb.</p>
-        <p>{{$amprahan->isi}}</p>
+        <h1><strong>LAPORAN PENYUSUTAN STOK:</strong></h1>
     </div>
     
     <!-- Table Section -->
@@ -81,28 +66,33 @@
     <table>
         <thead>
             <tr>
-                <th>No</th>
-                <th>Barang</th>
-                <th>Total</th>
+            <th>No</th>
+            <th>Nama Aset</th>
+            <th>Tahun Perolehan</th>
+            <th>Quantity</th>
+            <th>Harga Perolehan</th>
+            <th>Tahun Sekarang</th>
+            <th>Pengurangan</th>
+            <th>Harga Setelah Penyusutan</th>
             </tr>
         </thead>
         <tbody>
+            @foreach($data_penyusutan as $index => $item)
             <tr>
-                <td>1</td>
-                <td>{{ $amprahan->nama_barang }}</td>
-                <td>{{ $amprahan->harga_barang }}</td>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ $item['nama_aset'] }}</td>
+                <td>{{ $item['tahun_perolehan'] }}</td>
+                <td>{{ $item['quantity'] }}</td>
+                <td>{{ number_format($item['harga_perolehan'], 2) }}</td>
+                <td>{{ $item['tahun_sekarang'] }}</td>
+                <td>{{ number_format($item['pengurangan'], 2) }}</td>
+                <td>{{ number_format($item['harga_setelah_penyusutan'], 2) }}</td>
             </tr>
+            @endforeach
         </tbody>
     </table>
     </div>
 
-    <!-- Footer (Right aligned) -->
-    <div class="footer">
-        <div style="text-align: center; margin-top: 50px;">
-            <p>Banda Aceh, {{ $amprahan->created_at->format('d F Y') }}</p>
-            <p style="margin-top: 100px; font-style: italic;">({{ $amprahan->user->name }})</p>
-        </div>
-    </div>
 
 </body>
 </html>

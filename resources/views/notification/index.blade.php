@@ -103,9 +103,6 @@
                     <td>${value.jenis.jenis_barang}</td>
                     <td>${kondisi_barang}</td>
                     <td>
-                       <a href="/barang/detail/${value.id}" target="_blank" class="mb-2 btn btn-icon btn-info btn-lg">
-                            <i class="fas fa-eye"></i>
-                        </a>
                         <a href="javascript:void(0)" id="button_edit_barang" data-id="${value.id}" class="mb-2 btn btn-icon btn-warning btn-lg"><i class="far fa-edit"></i> </a>
                         <a href="javascript:void(0)" id="button_hapus_barang" data-id="${value.id}" class="mb-2 btn btn-icon btn-danger btn-lg"><i class="fas fa-trash"></i> </a>
                     </td>
